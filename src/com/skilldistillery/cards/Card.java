@@ -3,18 +3,26 @@ package com.skilldistillery.cards;
 public class Card {
 	private Rank rank;
 	private Suit suit;
+	private CardCountingRank cardCountingRank;
 
 	public Card() {
 
 	}
 
-	public Card(Rank rank, Suit suit) {
+	public Card(Rank rank, Suit suit, CardCountingRank cardCountingRank) {
+		super();
 		this.rank = rank;
 		this.suit = suit;
+		this.cardCountingRank = cardCountingRank;
 	}
+
 
 	public int getValue() {
 		return rank.getValue();
+	}
+	
+	public int getCardCountingValue() {
+		return cardCountingRank.getValue();
 	}
 
 	@Override
@@ -24,6 +32,11 @@ public class Card {
 		result = prime * result + ((rank == null) ? 0 : rank.hashCode());
 		result = prime * result + ((suit == null) ? 0 : suit.hashCode());
 		return result;
+	}
+	public Card(Rank rank, Suit suit) {
+		super();
+		this.rank = rank;
+		this.suit = suit;
 	}
 
 	@Override
@@ -65,5 +78,13 @@ public class Card {
 
 	public void setSuit(Suit suit) {
 		this.suit = suit;
+	}
+
+	public CardCountingRank getCardCountingRank() {
+		return cardCountingRank;
+	}
+
+	public void setCardCountingRank(CardCountingRank cardCountingRank) {
+		this.cardCountingRank = cardCountingRank;
 	}
 }

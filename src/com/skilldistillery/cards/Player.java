@@ -1,16 +1,36 @@
 package com.skilldistillery.cards;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Player {
 	private String name;
 	private int chips;
 	private int winStreak;
 	private int wagerAmount;
+	private List<Card> playerHand;
+
+	public Player(String name, int chips, int winStreak, List<Card> playerHand) {
+		super();
+		this.name = name;
+		this.chips = chips;
+		this.winStreak = winStreak;
+		this.playerHand = playerHand;
+	}
 
 	public Player(String name, int chips, int winStreak) {
 		super();
 		this.name = name;
 		this.chips = chips;
 		this.winStreak = winStreak;
+	}
+	
+	public void createHand() {
+		playerHand = new ArrayList<>();
+	}
+
+	public void addCard(Card card) {
+		playerHand.add(card);
 	}
 
 	public String getName() {
@@ -48,6 +68,14 @@ public class Player {
 
 	public void setWagerAmount(int wagerAmount) {
 		this.wagerAmount = wagerAmount;
+	}
+
+	public List<Card> getPlayerHand() {
+		return playerHand;
+	}
+
+	public void setPlayerHand(List<Card> playerHand) {
+		this.playerHand = playerHand;
 	}
 	
 	

@@ -6,15 +6,19 @@ import java.util.List;
 
 public class Deck {
 	private List<Card> cards;
+
 	public Deck() {
 		cards = createDeck();
 	}
 
 	private List<Card> createDeck() {
-		List<Card> deck = new ArrayList<>(52);
-		for (Suit s : Suit.values()) {
-			for (Rank r : Rank.values()) {
-				deck.add(new Card(r, s));
+		List<Card> deck = new ArrayList<>();
+		int randomNumberOfDecks = (int)((Math.random()*6) + 1);
+		for (int i = 0; i < randomNumberOfDecks; i++) {
+			for (Suit s : Suit.values()) {
+				for (Rank r : Rank.values()) {
+					deck.add(new Card(r, s));
+				}
 			}
 		}
 		return deck;
@@ -31,8 +35,8 @@ public class Deck {
 	public Card dealCard() {
 		return cards.remove(0);
 	}
-	
+
 	public void clearDeck() {
-		 cards.clear();
+		cards.clear();
 	}
 }
