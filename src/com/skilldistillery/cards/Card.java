@@ -47,7 +47,23 @@ public class Card {
 		StringBuilder builder = new StringBuilder();
 		builder.append(rank);
 		builder.append(" of ");
-		builder.append(suit);
+		builder.append(this.suit);
 		return builder.toString();
+	}
+
+	public Rank getRank() {
+		return rank;
+	}
+
+	public void setRank(Rank rank) {
+		this.rank = rank;
+	}
+
+	public Suit getSuit() {
+		return suit;
+	}
+
+	public void setSuit(Suit suit) {
+		this.suit = suit;
 	}
 }

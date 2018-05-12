@@ -15,31 +15,4 @@ public enum Rank {
 		return value;
 	}
 
-//	public void printValue(Rank rank) {
-//		switch (rank) {
-//		case ACE:
-//		case KING:
-//		case QUEEN:
-//		case JACK:
-//		case TEN:
-//			break;
-//		case TWO:
-//			break;
-//		case THREE:
-//			break;
-//		case FOUR:
-//			break;
-//		case FIVE:
-//			break;
-//		case SIX:
-//			break;
-//		case SEVEN:
-//			break;
-//		case EIGHT:
-//			break;
-//		case NINE:
-//			break;
-//		default:
-//			break;
-//		}
-	}
+}
