@@ -4,6 +4,7 @@ public class Player {
 	private String name;
 	private int chips;
 	private int winStreak;
+	private int wagerAmount;
 
 	public Player(String name, int chips, int winStreak) {
 		super();
@@ -39,6 +40,14 @@ public class Player {
 
 	public void setWinStreak(int winStreak) {
 		this.winStreak = winStreak;
+	}
+
+	public int getWagerAmount() {
+		return wagerAmount;
+	}
+
+	public void setWagerAmount(int wagerAmount) {
+		this.wagerAmount = wagerAmount;
 	}
 	
 	
