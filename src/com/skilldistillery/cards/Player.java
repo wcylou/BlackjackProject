@@ -3,13 +3,15 @@ package com.skilldistillery.cards;
 public class Player {
 	private String name;
 	private int chips;
+	private int winStreak;
 
-	public Player(String name, int chips) {
+	public Player(String name, int chips, int winStreak) {
 		super();
 		this.name = name;
 		this.chips = chips;
+		this.winStreak = winStreak;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -29,6 +31,14 @@ public class Player {
 	@Override
 	public String toString() {
 		return name + "currently has " + chips;
+	}
+
+	public int getWinStreak() {
+		return winStreak;
+	}
+
+	public void setWinStreak(int winStreak) {
+		this.winStreak = winStreak;
 	}
 	
 	
