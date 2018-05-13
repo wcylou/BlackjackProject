@@ -20,15 +20,12 @@ public class BlackjackHand extends Hand {
 
 	public void run() {
 		intro();
-		checkConditions();
-		playerTurn(player.getPlayerHand());
-		dealerTurn();
-		determineWinner(player);
-		askPlayAgain();
+		runRepeat();
 	}
 	
 	public void runRepeat() {
 		wager();
+		dealCards();
 		checkConditions();
 		playerTurn(player.getPlayerHand());
 		dealerTurn();
@@ -43,14 +40,49 @@ public class BlackjackHand extends Hand {
 		String name = sc.next();
 		player.setName(name);
 		deck = new Deck();
-		wager();
-		initialDeal();		
+		System.out.println("Randomising 1-6 decks...shuffle...shuffle...shuffle");
+		System.out.println("You are playing with " + (deck.checkDeckSize() / 52) + " decks");
+		deck.shuffle();
+	}
+	
+	private void wager() {
+		System.out.println("Current chip count: " + player.getChips());
+		System.out.println("How much do you want to wager?");
+		player.setWagerAmount(sc.nextInt());
+		while (player.getWagerAmount() < 0 || player.getWagerAmount() > player.getChips()) {
+			System.out.println("Please enter amount between 0 and " + player.getChips());
+			player.setWagerAmount(sc.nextInt());
+		}
+	}
+	
+	private void dealCards() {
+		player.createHand();
+		Card firstPlayerCard = deck.dealCard();
+		player.addCard((firstPlayerCard));
+		Card secondPlayerCard = deck.dealCard();
+		player.addCard(secondPlayerCard);
+		
+		dealer.createHand();
+		dealer.addCard(deck.dealCard());
+		dealer.addCard(deck.dealCard());
+		
+		double runningCount = 0;
+		for (Card card : dealer.getDealerHand()) {
+			runningCount += card.getValue();
+		}
+		System.out.println(runningCount);
+		
+		
+		
+		System.out.println(player.getName() + "'s hand: " + player.getPlayerHand());
+		System.out.println("Current hand value: " + getHandValue(player.getPlayerHand()));
+		System.out.println("Dealer's first card is " + dealer.getDealerHand().get(0) + "\n");
 	}
 
 	private void checkConditions() {
 		boolean keepPlaying = true;
 		while (keepPlaying) {
-			if (dealer.getDealerHand().get(0).getValue() == 11) {
+			if (dealer.getDealerHand().get(0).getValue() == 11 ){
 				insurance();
 				if (getHandValue(player.getPlayerHand()) == 21) {
 					blackjack();
@@ -81,35 +113,6 @@ public class BlackjackHand extends Hand {
 		}
 
 		doudbleDown();
-	}
-
-	private void wager() {
-		System.out.println("Current chip count: " + player.getChips());
-		System.out.println("How much do you want to wager?");
-		player.setWagerAmount(sc.nextInt());
-		while (player.getWagerAmount() < 0 || player.getWagerAmount() > player.getChips()) {
-			System.out.println("Please enter amount between 0 and " + player.getChips());
-			player.setWagerAmount(sc.nextInt());
-		}
-	}
-
-	private void initialDeal() {
-		deck.shuffle();
-		System.out.println("Randomising 1-6 decks...shuffle...shuffle...shuffle");
-		System.out.println("You are playing with " + (deck.checkDeckSize() / 52) + " decks");
-		player.createHand();
-		Card firstPlayerCard = deck.dealCard();
-		player.addCard((firstPlayerCard));
-		Card secondPlayerCard = deck.dealCard();
-		player.addCard(secondPlayerCard);
-		dealer.createHand();
-		dealer.addCard(deck.dealCard());
-		dealer.addCard(deck.dealCard());
-		// System.out.println(runningCardCounter());
-		System.out.println(player.getName() + "'s hand: " + player.getPlayerHand());
-		System.out.println("Current hand value: " + getHandValue(player.getPlayerHand()));
-		System.out.println("Dealer's first card is " + dealer.getDealerHand().get(0) + "\n");
-
 	}
 
 	private void doudbleDown() {
@@ -147,11 +150,11 @@ public class BlackjackHand extends Hand {
 			System.out.println("Computer also got blackjack... What are the odds eh");
 			playerLoses();
 			askPlayAgain();
-		} else if (getHandValue(dealer.getDealerHand()) == 21) {
+		} else if (dealer.getDealerHand().get(0).getValue() == 11 &&getHandValue(dealer.getDealerHand()) == 21) {
 			System.out.println("Computer got BLACKJACK");
 			playerLoses();
 			askPlayAgain();
-		} else {
+		} else if (getHandValue(player.getPlayerHand()) == 21) {
 			player.setChips(player.getChips() + (int) (1.5 * player.getWagerAmount()));
 			System.out.println(player.getName() + " got BLACKJACK");
 			System.out.println("You win 1.5x!!");
@@ -326,8 +329,7 @@ public class BlackjackHand extends Hand {
 				System.exit(0);
 			}
 		}
-		System.out.println(player.getName() + " punches the dealer in the face");
-		System.out.println(player.getName() + " runs out laughing. Who's the loser now :P");
+		System.out.println(player.getName() + " grabs all the chips and runs out laughing. Who's the loser now.");
 		System.exit(0);
 	}
 
@@ -335,6 +337,8 @@ public class BlackjackHand extends Hand {
 		if (deck.checkDeckSize() < (deck.checkDeckSize() * 0.5)) {
 			deck.clearDeck();
 			deck = new Deck();
+			System.out.println("Randomising 1-6 decks...shuffle...shuffle...shuffle");
+			System.out.println("You are playing with " + (deck.checkDeckSize() / 52) + " decks");
 		}
 		runRepeat();
 	}

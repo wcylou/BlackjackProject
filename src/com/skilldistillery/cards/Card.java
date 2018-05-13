@@ -9,13 +9,11 @@ public class Card {
 
 	}
 
-	public Card(Rank rank, Suit suit, CardCountingRank cardCountingRank) {
+	public Card(Rank rank, Suit suit) {
 		super();
 		this.rank = rank;
 		this.suit = suit;
-		this.cardCountingRank = cardCountingRank;
 	}
-
 
 	public int getValue() {
 		return rank.getValue();
@@ -24,36 +22,7 @@ public class Card {
 	public int getCardCountingValue() {
 		return cardCountingRank.getValue();
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((rank == null) ? 0 : rank.hashCode());
-		result = prime * result + ((suit == null) ? 0 : suit.hashCode());
-		return result;
-	}
-	public Card(Rank rank, Suit suit) {
-		super();
-		this.rank = rank;
-		this.suit = suit;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Card other = (Card) obj;
-		if (rank != other.rank)
-			return false;
-		if (suit != other.suit)
-			return false;
-		return true;
-	}
+	
 
 	@Override
 	public String toString() {
@@ -86,5 +55,33 @@ public class Card {
 
 	public void setCardCountingRank(CardCountingRank cardCountingRank) {
 		this.cardCountingRank = cardCountingRank;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((cardCountingRank == null) ? 0 : cardCountingRank.hashCode());
+		result = prime * result + ((rank == null) ? 0 : rank.hashCode());
+		result = prime * result + ((suit == null) ? 0 : suit.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Card other = (Card) obj;
+		if (cardCountingRank != other.cardCountingRank)
+			return false;
+		if (rank != other.rank)
+			return false;
+		if (suit != other.suit)
+			return false;
+		return true;
 	}
 }
