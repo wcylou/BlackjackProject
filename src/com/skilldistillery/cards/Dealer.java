@@ -54,6 +54,4 @@ public class Dealer {
 			return false;
 		return true;
 	}
-
-
 }

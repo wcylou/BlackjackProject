@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.skilldistillery.cards.Card;
-import com.skilldistillery.cards.CardCountingRank;
 import com.skilldistillery.cards.Dealer;
 import com.skilldistillery.cards.Deck;
 import com.skilldistillery.cards.Hand;
@@ -17,34 +16,38 @@ public class BlackjackHand extends Hand {
 	private Deck deck;
 	private Dealer dealer = new Dealer();
 	private Player player = new Player("", 1000, 0);
+	private int deckSize;
 
 	public void run() {
 		intro();
 		runRepeat();
 	}
-	
+
 	public void runRepeat() {
 		wager();
 		dealCards();
 		checkConditions();
-		playerTurn(player.getPlayerHand());
+		playerTurn();
 		dealerTurn();
-		determineWinner(player);
+		determineWinner();
 		askPlayAgain();
 	}
 
 	private void intro() {
 		System.out.println("Welcome to Blackjack");
-		System.out.println("Aim of the game is 21 WINNER WINNER CHICKEN DINNER");
+		System.out.println("21 WINNER WINNER CHICKEN DINNER");
 		System.out.println("What is your name");
 		String name = sc.next();
 		player.setName(name);
 		deck = new Deck();
-		System.out.println("Randomising 1-6 decks...shuffle...shuffle...shuffle");
+		deck.setCardCountingValue(0);
+		System.out.println("Randomising 1-6 decks...SHUFLLING");
 		System.out.println("You are playing with " + (deck.checkDeckSize() / 52) + " decks");
+		deckSize = deck.checkDeckSize();
+		System.out.println("Hi-Lo card counting strategy in play. Don't get caught");
 		deck.shuffle();
 	}
-	
+
 	private void wager() {
 		System.out.println("Current chip count: " + player.getChips());
 		System.out.println("How much do you want to wager?");
@@ -54,35 +57,25 @@ public class BlackjackHand extends Hand {
 			player.setWagerAmount(sc.nextInt());
 		}
 	}
-	
+
 	private void dealCards() {
 		player.createHand();
 		Card firstPlayerCard = deck.dealCard();
 		player.addCard((firstPlayerCard));
 		Card secondPlayerCard = deck.dealCard();
 		player.addCard(secondPlayerCard);
-		
 		dealer.createHand();
 		dealer.addCard(deck.dealCard());
-		dealer.addCard(deck.dealCard());
-		
-		double runningCount = 0;
-		for (Card card : dealer.getDealerHand()) {
-			runningCount += card.getValue();
-		}
-		System.out.println(runningCount);
-		
-		
-		
 		System.out.println(player.getName() + "'s hand: " + player.getPlayerHand());
 		System.out.println("Current hand value: " + getHandValue(player.getPlayerHand()));
 		System.out.println("Dealer's first card is " + dealer.getDealerHand().get(0) + "\n");
+		dealer.addCard(deck.dealCard());
 	}
 
 	private void checkConditions() {
 		boolean keepPlaying = true;
 		while (keepPlaying) {
-			if (dealer.getDealerHand().get(0).getValue() == 11 ){
+			if (dealer.getDealerHand().get(0).getValue() == 11) {
 				insurance();
 				if (getHandValue(player.getPlayerHand()) == 21) {
 					blackjack();
@@ -111,17 +104,25 @@ public class BlackjackHand extends Hand {
 			}
 			keepChecking = false;
 		}
-
 		doudbleDown();
 	}
 
 	private void doudbleDown() {
 		if (player.getPlayerHand().get(0).getValue() < 10 && player.getPlayerHand().get(1).getValue() < 10) {
+			System.out.println(player.getName() + "'s hand contains two number cards");
 			System.out.println("Do you want to double down? Y/N?");
 			String doubleDownAnser = sc.next();
 			if (doubleDownAnser.equalsIgnoreCase("Y")) {
 				System.out.println("You are now wagering " + player.getWagerAmount() * 2 + " for this hand");
 				player.setWagerAmount(player.getWagerAmount() * 2);
+				Card d = deck.dealCard();
+				System.out.println(d);
+				player.getPlayerHand().add(d);
+				getHandValue(player.getPlayerHand());
+				System.out.println("Current hand value: " + getHandValue(player.getPlayerHand()));
+				dealerTurn();
+				determineWinner();
+				askPlayAgain();
 			}
 		}
 	}
@@ -150,7 +151,7 @@ public class BlackjackHand extends Hand {
 			System.out.println("Computer also got blackjack... What are the odds eh");
 			playerLoses();
 			askPlayAgain();
-		} else if (dealer.getDealerHand().get(0).getValue() == 11 &&getHandValue(dealer.getDealerHand()) == 21) {
+		} else if (dealer.getDealerHand().get(0).getValue() == 11 && getHandValue(dealer.getDealerHand()) == 21) {
 			System.out.println("Computer got BLACKJACK");
 			playerLoses();
 			askPlayAgain();
@@ -172,7 +173,7 @@ public class BlackjackHand extends Hand {
 		firstNewHand.add(firstSplitCard);
 		System.out.println("\nFirst split card hand is currently " + firstNewHand);
 		System.out.println("Total value: " + getHandValue(firstNewHand));
-		playerTurn(firstNewHand);
+		playerTurnSplit(firstNewHand);
 
 		List<Card> secondNewHand = new ArrayList<>();
 		Card oringinalSecondSplitCard = player.getPlayerHand().get(1);
@@ -181,25 +182,72 @@ public class BlackjackHand extends Hand {
 		secondNewHand.add(secondSplitCard);
 		System.out.println("\nSecond split card hand is currently " + secondNewHand);
 		System.out.println("Total value: " + getHandValue(secondNewHand));
-		playerTurn(secondNewHand);
+		playerTurnSplit(secondNewHand);
 
 		if (getHandValue(firstNewHand) <= 21 || getHandValue(secondNewHand) <= 21) {
 			dealerTurn();
+
+			int finalDealerCount = getHandValue(dealer.getDealerHand());
+
 			System.out.println("First hand split:");
-			determineWinner(player);
+			int finalFirstHandPlayerCount = getHandValue(firstNewHand);
+			if (finalDealerCount > 21 && finalFirstHandPlayerCount > 21) {
+				playerLoses();
+			} else if (finalDealerCount <= 21 && finalFirstHandPlayerCount > 21) {
+				playerLoses();
+			} else if (finalDealerCount > 21 && finalFirstHandPlayerCount <= 21) {
+				playerWins();
+			} else if (finalDealerCount <= 21 && finalFirstHandPlayerCount <= 21) {
+				if (finalDealerCount == finalFirstHandPlayerCount) {
+					playerLoses();
+				} else if (finalDealerCount > finalFirstHandPlayerCount) {
+					playerLoses();
+				} else {
+					playerWins();
+				}
+			}
+
 			System.out.println("Second hand split:");
-			determineWinner(player);
-			askPlayAgain();
-		} else {
-			System.out.println("First hand split:");
-			determineWinner(player);
-			System.out.println("Second hand split:");
-			determineWinner(player);
-			askPlayAgain();
+			int finalSecondHandPlayerCount = getHandValue(secondNewHand);
+			if (finalDealerCount > 21 && finalSecondHandPlayerCount > 21) {
+				playerLoses();
+			} else if (finalDealerCount <= 21 && finalSecondHandPlayerCount > 21) {
+				playerLoses();
+			} else if (finalDealerCount > 21 && finalSecondHandPlayerCount <= 21) {
+				playerWins();
+			} else if (finalDealerCount <= 21 && finalSecondHandPlayerCount <= 21) {
+				if (finalDealerCount == finalSecondHandPlayerCount) {
+					playerLoses();
+				} else if (finalDealerCount > finalSecondHandPlayerCount) {
+					playerLoses();
+				} else {
+					playerWins();
+				}
+			}
+
+			else if (getHandValue(firstNewHand) > 21 || getHandValue(secondNewHand) > 21) {
+				System.out.println("First hand split:");
+				playerLoses();
+				System.out.println("Second hand split:");
+				playerLoses();
+			}
 		}
+
+		System.out.println(player.getName() + "'s current chip count is " + player.getChips());
+		double runningCount = 0;
+		for (Card card : firstNewHand) {
+			runningCount += card.getCardCountingValue();
+		}
+		for (Card card : secondNewHand) {
+			runningCount += card.getCardCountingValue();
+		}
+		runningCount = deck.getCardCountingValue() + runningCount / ((deck.checkDeckSize() / 52));
+		deck.setCardCountingValue(runningCount);
+		runningCardCounter();
+		askPlayAgain();
 	}
 
-	private void playerTurn(List<Card> hand) {
+	private void playerTurnSplit(List<Card> hand) {
 		boolean keepPlaying = true;
 		while (keepPlaying) {
 			System.out.println("What do you want to do?\n1.Hit\n2.Stick");
@@ -212,9 +260,9 @@ public class BlackjackHand extends Hand {
 				getHandValue(hand);
 				System.out.println("Current hand value: " + getHandValue(hand));
 				if (getHandValue(hand) > 21) {
-					playerLoses();
+					System.out.println(player.getName() + " loses");
+					System.out.println("\nCurrent win streak: 0");
 					keepPlaying = false;
-					askPlayAgain();
 				}
 				break;
 			case 2:
@@ -226,43 +274,73 @@ public class BlackjackHand extends Hand {
 		}
 	}
 
+	private void playerTurn() {
+		boolean keepPlaying = true;
+		while (keepPlaying) {
+			System.out.println("What do you want to do?\n1.Hit\n2.Stick");
+			int hitOrStick = sc.nextInt();
+			switch (hitOrStick) {
+			case 1:
+				Card d = deck.dealCard();
+				System.out.println(d);
+				player.getPlayerHand().add(d);
+				getHandValue(player.getPlayerHand());
+				System.out.println("Current hand value: " + getHandValue(player.getPlayerHand()));
+				if (getHandValue(player.getPlayerHand()) > 21) {
+					playerLoses();
+					keepPlaying = false;
+					askPlayAgain();
+				}
+				break;
+			case 2:
+				System.out.println(player.getName() + " sticks");
+				System.out.println(player.getName() + "'s hand value is " + getHandValue(player.getPlayerHand()));
+				keepPlaying = false;
+				break;
+			}
+		}
+	}
+
 	private void dealerTurn() {
 		boolean keepPlaying = true;
-		int dealerHandValue = getHandValue(dealer.getDealerHand());
 		System.out.println("\nDealer's hand: " + dealer.getDealerHand());
 		System.out.println("Dealer's total is: " + getHandValue(dealer.getDealerHand()));
 
 		while (keepPlaying) {
-			if (getHandValue() == 17) {
-				int dealerAceHandvalue = getHandValueAceDealer();
+			if (getHandValue(dealer.getDealerHand()) == 17) {
 				for (Card card : dealer.getDealerHand()) {
-					if (card.getValue() == 11 && dealerAceHandvalue == 17) {
+					if (card.getValue() == 11 && getHandValueAceDealer(dealer.getDealerHand()) == 17) {
 						dealDealerCard();
-						if (dealerAceHandvalue <= 21) {
+						if (getHandValueAceDealer(dealer.getDealerHand()) <= 21) {
 							System.out.println("Computer sticks");
 							keepPlaying = false;
-						} else if (dealerAceHandvalue > 21) {
-							dealerAceHandvalue -= 11;
+						} else if (getHandValueAceDealer(dealer.getDealerHand()) > 21) {
+							int dealerHandValue = getHandValueAceDealer(dealer.getDealerHand());
+							dealerHandValue -=11;
 							do {
 								dealDealerCard();
-							} while (dealerAceHandvalue < 17);
-							if (dealerAceHandvalue >= 17 && dealerAceHandvalue < 21) {
+							} while (dealerHandValue < 17);
+							if (dealerHandValue >= 17 && dealerHandValue < 21) {
 								System.out.println("Computer sticks");
 								keepPlaying = false;
-							}
+							} else if (dealerHandValue > 21)
+								System.out.println("Dealer goes bust");
+							keepPlaying = false;
 						}
+					} else {
+						System.out.println("Computer sticks");
+						keepPlaying = false;
 					}
+				}
+			} else if (getHandValue(dealer.getDealerHand()) < 17) {
+				dealDealerCard();
+				if (getHandValue(dealer.getDealerHand()) >= 17 && getHandValue(dealer.getDealerHand()) <= 21) {
+					System.out.println("Computer sticks");
+					keepPlaying = false;
+				} else if (getHandValue(dealer.getDealerHand()) > 21) {
 					System.out.println("Dealer goes bust");
 					keepPlaying = false;
 				}
-			} else if (dealerHandValue < 17) {
-				dealDealerCard();
-				if (dealerHandValue < 21) {
-					keepPlaying = false;
-				}
-			} else if (dealerHandValue > 21) {
-				System.out.println("Dealer goes bust");
-				keepPlaying = false;
 			} else {
 				System.out.println("Computer sticks");
 				keepPlaying = false;
@@ -278,7 +356,7 @@ public class BlackjackHand extends Hand {
 		System.out.println("Dealer's total is: " + getHandValue(dealer.getDealerHand()));
 	}
 
-	private void determineWinner(Player player) {
+	private void determineWinner() {
 		int finalPlayerCount = getHandValue(player.getPlayerHand());
 		int finalDealerCount = getHandValue(dealer.getDealerHand());
 		if (finalDealerCount > 21 && finalPlayerCount > 21) {
@@ -323,6 +401,7 @@ public class BlackjackHand extends Hand {
 			System.out.println("\nWould you like to play again? Y/N");
 			String playAgain = sc.next();
 			if (playAgain.equalsIgnoreCase("Y")) {
+				deck.setCardCountingValue(runningCardCounter());
 				runGameAgain();
 			} else {
 				System.out.println("Bye");
@@ -334,9 +413,10 @@ public class BlackjackHand extends Hand {
 	}
 
 	private void runGameAgain() {
-		if (deck.checkDeckSize() < (deck.checkDeckSize() * 0.5)) {
+		if (deck.checkDeckSize() < (deckSize * 0.5)) {
 			deck.clearDeck();
 			deck = new Deck();
+			deck.setCardCountingValue(0);
 			System.out.println("Randomising 1-6 decks...shuffle...shuffle...shuffle");
 			System.out.println("You are playing with " + (deck.checkDeckSize() / 52) + " decks");
 		}
@@ -358,23 +438,24 @@ public class BlackjackHand extends Hand {
 		return totalValue;
 	}
 
-	private int getHandValueAceDealer() {
+	private int getHandValueAceDealer(List<Card> dealerHand) {
 		int totalValue = 0;
-		for (Card card : dealer.getDealerHand()) {
+		for (Card card : dealerHand) {
 			totalValue += card.getValue();
 		}
 		return totalValue;
 	}
 
-	private int runningCardCounter() {
-		int runningCount = 0;
+	private double runningCardCounter() {
+		double runningCount = 0;
 		for (Card card : player.getPlayerHand()) {
 			runningCount += card.getCardCountingValue();
 		}
-		// for (Card card2 : dealerHand) {
-		// runningCount += card2.getCardCountingValue();
-		// }
+		for (Card card : dealer.getDealerHand()) {
+			runningCount += card.getCardCountingValue();
+		}
+		runningCount = deck.getCardCountingValue() + (runningCount / ((deck.checkDeckSize() / 52)));
+		System.out.println("True count: " + runningCount);
 		return runningCount;
-
 	}
 }

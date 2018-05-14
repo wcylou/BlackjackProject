@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Deck {
 	private List<Card> cards;
+	private double cardCountingValue;
 
 	public Deck() {
 		cards = createDeck();
@@ -39,4 +40,13 @@ public class Deck {
 	public void clearDeck() {
 		cards.clear();
 	}
+
+	public double getCardCountingValue() {
+		return cardCountingValue;
+	}
+
+	public void setCardCountingValue(double cardCountingValue) {
+		this.cardCountingValue = cardCountingValue;
+	}
+
 }
