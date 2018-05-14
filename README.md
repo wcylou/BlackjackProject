@@ -20,6 +20,7 @@
 - Normal gameplay consists of hitting and sticking
 - The dealer will take its turn if the player has not already gone bust.
 - The winner will be decided and chips adjusted accordingly.
+- If the user chooses to play another round, a true count based on the High Lo card counting strategy will be displayed. This is adjusted for how many cards there are in the deck currently (randomised at start from 1 to 6).
 - Once the user has no more money, the game finishes.
 
 ### Challenges and Lessons Learned
@@ -29,8 +30,8 @@
 
 **2. Stretch goals:**
 
-- Working out the order in which special conditions needed to be checked such as Blackjack or insurance was challenging. When I implemented them, they often had knock on consequences for the round's gameplay.
-- I ran into trouble implementing the soft/hard ace for the dealer as I had to make sure I covered every possibility and there were no null pointer exceptions.
+- Working out the order in which special conditions needed to be checked such as Blackjack or insurance was challenging. When I implemented them, they often had knock on consequences for the round's gameplay e.g. if the user chose insurance and the dealer got Blackjack then you could still continue playing the main hand.
+- I ran into trouble implementing the soft/hard ace for the dealer as I had to make sure I covered every possibility and there were no null pointer exceptions. I ended up doing this separately from the normal totalling of card values.
 
 **3. Enums:**
 - First time using enums and this was particularly useful for having two different values for normal and card counting.
